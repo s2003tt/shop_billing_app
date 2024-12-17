@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Billing App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            background-color: #218838;
+        }
+
+        .bill-list {
+            margin-top: 20px;
+        }
+
+        .bill-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .bill-list th, .bill-list td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .bill-list th {
+            background-color: #f4f4f4;
+        }
+
+        .total {
+            margin-top: 20px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Shop Billing App</h1>
+        <div class="input-group">
+            <label for="customer-name">Customer Name</label>
+            <input type="text" id="customer-name" placeholder="Enter customer name">
+        </div>
+        <div class="input-group">
+            <label for="bill-date">Date</label>
+            <input type="date" id="bill-date">
+        </div>
+        <div class="input-group">
+            <label for="item-name">Item Name</label>
+            <input type="text" id="item-name" placeholder="Enter item name">
+        </div>
+        <div class="input-group">
+            <label for="item-quantity">Quantity</label>
+            <input type="number" id="item-quantity" placeholder="Enter quantity">
+        </div>
+        <div class="input-group">
+            <label for="item-price">Price per Item (Rs.)</label>
+            <input type="number" id="item-price" placeholder="Enter price per item">
+        </div>
+        <button class="btn" onclick="addItem()">Add Item</button>
+        <button class="btn" onclick="printBill()" style="background-color: #007bff;">Print Bill</button>
+        <div class="bill-list">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="bill-table">
+                </tbody>
+            </table>
+        </div>
+        <div class="total" id="total-bill">Total Bill: Rs. 0</div>
+    </div>
+
+    <script>
+        let totalBill = 0;
+
+        function addItem() {
+            const itemName = document.getElementById('item-name').value;
+            const itemQuantity = parseInt(document.getElementById('item-quantity').value);
+            const itemPrice = parseFloat(document.getElementById('item-price').value);
+            
+            if (!itemName || itemQuantity <= 0 || itemPrice <= 0) {
+                alert("Please enter valid details.");
+                return;
+            }
+
+            const itemTotal = itemQuantity * itemPrice;
+            totalBill += itemTotal;
+
+            const table = document.getElementById('bill-table');
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${itemName}</td>
+                <td>${itemQuantity}</td>
+                <td>Rs. ${itemPrice.toFixed(2)}</td>
+                <td>Rs. ${itemTotal.toFixed(2)}</td>
+            `;
+
+            table.appendChild(row);
+
+            document.getElementById('total-bill').innerText = `Total Bill: Rs. ${totalBill.toFixed(2)}`;
+            
+            // Clear input fields
+            document.getElementById('item-name').value = '';
+            document.getElementById('item-quantity').value = '';
+            document.getElementById('item-price').value = '';
+        }
+
+        function printBill() {
+            const customerName = document.getElementById('customer-name').value;
+            const billDate = document.getElementById('bill-date').value;
+            const billTable = document.getElementById('bill-table').innerHTML;
+            const totalBill = document.getElementById('total-bill').innerText;
+            
+            const newWindow = window.open('', '', 'width=800,height=600');
+            newWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Print Bill</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; }
+                            h1 { text-align: center; }
+                            p { font-size: 18px; margin: 10px 0; }
+                            .bold { font-weight: bold; }
+                            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                            th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+                            th { background-color: #f4f4f4; }
+                            .total { text-align: right; font-weight: bold; font-size: 20px; margin-top: 20px; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>Invoice</h1>
+                        <p><span class="bold">Customer Name:</span> ${customerName}</p>
+                        <p><span class="bold">Date:</span> ${billDate}</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Item Name</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${billTable}
+                            </tbody>
+                        </table>
+                        <div class="total">${totalBill}</div>
+                    </body>
+                </html>
+            `);
+            newWindow.document.close();
+            newWindow.print();
+        }
+    </script>
+</body>
+</html>
